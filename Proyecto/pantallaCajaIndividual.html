@@ -8,15 +8,20 @@
     <script src="scripts.js" defer></script>
 </head>
 <body>
+
 <div class="container mt-5">
     <h1>Caja <span id="cajaNumero"></span></h1>
 
-    <div id="informacionCaja">
-        <!-- Información de la caja y cliente asignado (si lo hay) -->
+    <div id="estadoCaja">
+        <!-- Aquí se mostrará el estado de la caja -->
     </div>
 
-    <button class="btn btn-primary mt-3" onclick="llamarCliente()">Llamar Cliente</button>
-    <button class="btn btn-success mt-3" onclick="finalizarConsulta()">Finalizar Consulta</button>
+    <button class="btn btn-warning" onclick="llamarCliente()">Llamar Cliente</button>
+    <button class="btn btn-success" onclick="finalizarConsulta()">Finalizar Consulta</button>
+    <button class="btn btn-danger" onclick="cerrarCaja()">Cerrar Caja</button>
+
+    <button class="btn btn-primary mt-3" onclick="redirigirACajasGenerales()">Volver a Cajas Generales</button>
 </div>
+
 </body>
 </html>

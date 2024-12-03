@@ -13,9 +13,9 @@ if (!isset($_SESSION['cajas'])) {
 if (isset($_GET['accion'])) {
     switch ($_GET['accion']) {
         case 'obtenerCola':
-            // Devuelve la cola de espera
             echo json_encode($_SESSION['cola']);
             break;
+        
 
         case 'obtenerCajas':
             // Devuelve el estado de las cajas
@@ -36,27 +36,42 @@ if (isset($_GET['accion'])) {
             echo json_encode(['mensaje' => "Turno $nuevoTurno agregado a la cola"]);
             break;
 
-        case 'asignarClienteCaja':
+         // Asignar un cliente a una caja
+         case 'asignarClienteCaja':
             // Asignar un cliente a una caja específica
-            $cajaIndex = $_GET['cajaIndex'];
-            if ($cajaIndex >= 0 && $cajaIndex < 4 && count($_SESSION['cola']) > 0 && $_SESSION['cajas'][$cajaIndex] === null) {
-                $_SESSION['cajas'][$cajaIndex] = array_shift($_SESSION['cola']);
-                echo json_encode(['mensaje' => "Cliente asignado a la Caja " . ($cajaIndex + 1)]);
+            $cajaIndex = $_GET['cajaIndex'];  // Obtener el índice de la caja
+            if ($cajaIndex >= 0 && $cajaIndex < 4) {
+                // Verificar si la caja está vacía y si hay clientes en la cola
+                if ($_SESSION['cajas'][$cajaIndex] === null && count($_SESSION['cola']) > 0) {
+                    // Asignar el primer cliente de la cola a la caja
+                    $_SESSION['cajas'][$cajaIndex] = array_shift($_SESSION['cola']);
+                    echo json_encode(['mensaje' => "Cliente asignado a la Caja " . ($cajaIndex + 1)]);
+                } else {
+                    // Si la caja ya está ocupada o no hay clientes en la cola
+                    echo json_encode(['error' => 'No se puede asignar cliente a la caja']);
+                }
             } else {
-                echo json_encode(['error' => 'No se puede asignar cliente a la caja']);
+                echo json_encode(['error' => 'Índice de caja inválido']);
             }
             break;
 
+
+        // Finalizar la consulta de una caja
         case 'finalizarConsulta':
-            // Finalizar la consulta de una caja y liberar la caja
-            $cajaIndex = $_GET['cajaIndex'];
-            if ($cajaIndex >= 0 && $cajaIndex < 4 && $_SESSION['cajas'][$cajaIndex] !== null) {
-                $_SESSION['cajas'][$cajaIndex] = null;
-                echo json_encode(['mensaje' => "Caja " . ($cajaIndex + 1) . " liberada"]);
-            } else {
-                echo json_encode(['error' => 'Caja no ocupada']);
-            }
-            break;
+        $cajaIndex = $_GET['cajaIndex'];
+        if ($cajaIndex >= 0 && $cajaIndex < 4 && $_SESSION['cajas'][$cajaIndex] !== null) {
+        $_SESSION['cajas'][$cajaIndex] = null; // Liberar la caja
+        echo json_encode(['mensaje' => "Caja " . ($cajaIndex + 1) . " liberada"]);
+        } else {
+        echo json_encode(['error' => 'Caja no tiene cliente']);
+        }
+        break;
+
+                
+            
+                
+                
+                
     }
 }
 ?>
