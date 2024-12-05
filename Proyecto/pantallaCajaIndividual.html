@@ -12,16 +12,28 @@
 <div class="container mt-5">
     <h1>Caja <span id="cajaNumero"></span></h1>
 
-    <div id="estadoCaja">
+    <div id="estadoCaja" class="mb-3">
         <!-- Aquí se mostrará el estado de la caja -->
+        Caja disponible
     </div>
 
     <button class="btn btn-warning" onclick="llamarCliente()">Llamar Cliente</button>
-    <button class="btn btn-success" onclick="finalizarConsulta()">Finalizar Consulta</button>
-    <button class="btn btn-danger" onclick="cerrarCaja()">Cerrar Caja</button>
-
-    <button class="btn btn-primary mt-3" onclick="redirigirACajasGenerales()">Volver a Cajas Generales</button>
 </div>
+
+<script>
+    // Aseguramos que el número de caja se cargue directamente en este archivo
+    document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const cajaIndex = urlParams.get("cajaIndex");
+
+        if (cajaIndex !== null) {
+            const cajaNumeroSpan = document.getElementById("cajaNumero");
+            cajaNumeroSpan.textContent = parseInt(cajaIndex) + 1;
+        } else {
+            console.error("No se encontró el parámetro 'cajaIndex' en la URL.");
+        }
+    });
+</script>
 
 </body>
 </html>

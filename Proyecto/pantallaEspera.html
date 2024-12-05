@@ -18,14 +18,20 @@
         <!-- Aquí se mostrarán los clientes de la cola -->
     </ul>
 
-    <!-- Lista de cajas (sin opciones) -->
+    <!-- Lista de cajas activas -->
     <h3>Cajas Activas</h3>
     <div id="listaCajas" class="row">
-        <!-- Aquí se mostrarán las cajas -->
+        <!-- Aquí se mostrarán las cajas activas -->
+    </div>
+
+    <!-- Mensaje dinámico -->
+    <div id="mensajeClienteCaja" class="mt-4 p-3 bg-light border rounded">
+        <!-- Aquí se mostrará el mensaje "Cliente X dirigirse a la Caja Y" -->
+        <p>Esperando asignación de clientes...</p>
     </div>
 
     <!-- Botón de actualización -->
-    <button class="btn btn-info mt-3" onclick="actualizarEstado()">Actualizar Estado</button>
+    <button class="btn btn-info mt-3" onclick="actualizarEspera()">Actualizar Estado</button>
 </div>
 
 </body>

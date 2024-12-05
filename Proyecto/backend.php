@@ -1,77 +1,72 @@
-<?php 
+<?php
 session_start();
+header("Content-Type: application/json");
 
-// Verifica si la cola o las cajas existen en la sesión. Si no, las inicializa.
-if (!isset($_SESSION['cola'])) {
-    $_SESSION['cola'] = [];  // Cola de espera vacía
+// Inicializar las cajas y la cola de turnos si no existen
+if (!isset($_SESSION["colaTurnos"])) {
+    $_SESSION["colaTurnos"] = [];
+}
+if (!isset($_SESSION["cajas"])) {
+    $_SESSION["cajas"] = array_fill(0, 4, null); // Inicializa 4 cajas disponibles
 }
 
-if (!isset($_SESSION['cajas'])) {
-    $_SESSION['cajas'] = [null, null, null, null];  // Las 4 cajas están vacías
+$accion = $_GET["accion"] ?? null;
+
+// Obtener el estado de las cajas
+if ($accion === "obtenerCajas") {
+    echo json_encode($_SESSION["cajas"]);
+    exit;
 }
 
-if (isset($_GET['accion'])) {
-    switch ($_GET['accion']) {
-        case 'obtenerCola':
-            echo json_encode($_SESSION['cola']);
-            break;
-        
+if ($accion === "obtenerCola") {
+    echo json_encode($_SESSION["colaTurnos"]);
+    exit;
+}
 
-        case 'obtenerCajas':
-            // Devuelve el estado de las cajas
-            echo json_encode($_SESSION['cajas']);
-            break;
-
-        case 'reiniciarSistema':
-            // Reinicia la cola y las cajas
-            $_SESSION['cola'] = [];
-            $_SESSION['cajas'] = [null, null, null, null];
-            echo json_encode(['mensaje' => 'Sistema reiniciado']);
-            break;
-
-        case 'generarTurno':
-            // Genera un nuevo turno y lo agrega a la cola
-            $nuevoTurno = count($_SESSION['cola']) + 1;
-            $_SESSION['cola'][] = $nuevoTurno;
-            echo json_encode(['mensaje' => "Turno $nuevoTurno agregado a la cola"]);
-            break;
-
-         // Asignar un cliente a una caja
-         case 'asignarClienteCaja':
-            // Asignar un cliente a una caja específica
-            $cajaIndex = $_GET['cajaIndex'];  // Obtener el índice de la caja
-            if ($cajaIndex >= 0 && $cajaIndex < 4) {
-                // Verificar si la caja está vacía y si hay clientes en la cola
-                if ($_SESSION['cajas'][$cajaIndex] === null && count($_SESSION['cola']) > 0) {
-                    // Asignar el primer cliente de la cola a la caja
-                    $_SESSION['cajas'][$cajaIndex] = array_shift($_SESSION['cola']);
-                    echo json_encode(['mensaje' => "Cliente asignado a la Caja " . ($cajaIndex + 1)]);
-                } else {
-                    // Si la caja ya está ocupada o no hay clientes en la cola
-                    echo json_encode(['error' => 'No se puede asignar cliente a la caja']);
-                }
-            } else {
-                echo json_encode(['error' => 'Índice de caja inválido']);
-            }
-            break;
+// Reiniciar el sistema
+if ($accion === "reiniciarSistema") {
+    $_SESSION["colaTurnos"] = []; // Vaciar la cola
+    $_SESSION["cajas"] = array_fill(0, 4, null); // Reiniciar las cajas (4 como ejemplo)
+    echo json_encode(["mensaje" => "Sistema reiniciado correctamente."]);
+    exit;
+}
 
 
-        // Finalizar la consulta de una caja
-        case 'finalizarConsulta':
-        $cajaIndex = $_GET['cajaIndex'];
-        if ($cajaIndex >= 0 && $cajaIndex < 4 && $_SESSION['cajas'][$cajaIndex] !== null) {
-        $_SESSION['cajas'][$cajaIndex] = null; // Liberar la caja
-        echo json_encode(['mensaje' => "Caja " . ($cajaIndex + 1) . " liberada"]);
-        } else {
-        echo json_encode(['error' => 'Caja no tiene cliente']);
-        }
-        break;
+// Obtener el último turno en la cola
+if ($accion === "obtenerUltimoTurno") {
+    $ultimoTurno = end($_SESSION["colaTurnos"]) ?: 0;
+    echo json_encode(["ultimoTurno" => $ultimoTurno]);
+    exit;
+}
 
-                
-            
-                
-                
-                
+// Generar un nuevo turno
+if ($accion === "generarTurno") {
+    $turno = intval($_GET["turno"]);
+    $_SESSION["colaTurnos"][] = $turno;
+    echo json_encode(["mensaje" => "Nuevo ticket generado: Turno $turno"]);
+    exit;
+}
+
+// Llamar al siguiente cliente en la caja
+if ($accion === "llamarCliente") {
+    $cajaIndex = intval($_GET["cajaIndex"]);
+
+    // Liberar caja si ya estaba ocupada
+    if (!isset($_SESSION["cajas"][$cajaIndex])) {
+        $_SESSION["cajas"][$cajaIndex] = null;
     }
+
+    // Obtener el siguiente cliente de la cola
+    $cliente = array_shift($_SESSION["colaTurnos"]);
+    if ($cliente === null) {
+        echo json_encode(["error" => "No hay clientes en la cola"]);
+        exit;
+    }
+
+    // Asignar cliente a la caja
+    $_SESSION["cajas"][$cajaIndex] = $cliente;
+    echo json_encode(["cliente" => $cliente]);
+    exit;
 }
-?>
+
+echo json_encode(["error" => "Acción no reconocida"]);
